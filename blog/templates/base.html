@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <!-- Basic Page Needs
+  ================================================== -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{% block title %}{% endblock %}--Djangoblogdemo</title>
+    <meta name="description" content="Djangoblogdemo">
+    <meta name="author" content="Alan_fu">
+
+    <!-- Mobile Specific Metas
+  ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- CSS
+  ================================================== -->
+    <link rel="stylesheet" href="/static/blog/css/zerogrid.css">
+    <link rel="stylesheet" href="/static/blog/css/style.css">
+    <link rel="stylesheet" href="/static/blog/css/responsive.css">
+
+
+    <link href='/static/blog/images/favicon.ico' rel='icon' type='image/x-icon'/>
+
+</head>
+<body>
+<div class="wrap-body zerogrid">
+    <!--------------Header--------------->
+    <header>
+        <div class="wrap-header">
+
+            <div class="top">
+                <div class="socials">
+                    <ul>
+                        <li><a href="#" title="facebook"><img  src="/static/blog/images/socials/facebook-32x32.png"/></a></li>
+                        <li><a href="#" title="google"><img  src="/static/blog/images/socials/google-32x32.png"/></a></li>
+                        <li><a href="#" title="twitter"><img  src="/static/blog/images/socials/twitter-32x32.png"/></a></li>
+                        <li><a href="/feed" title="rss"><img  src="/static/blog/images/socials/rss-32x32.png"/></a></li>
+                        <li><a href="#" title="youtube"><img  src="/static/blog/images/socials/youtube-32x32.png"/></a></li>
+                    </ul>
+                </div>
+                <div id="search">
+                    <div class="button-search"></div>
+                    <form id="searchform" method="post" class="searchform themeform" action="/search/?" onsubmit="return test()">
+                {% csrf_token %}
+				<div>
+					<input class="search" name="keyword" id="keyword" onblur="if(this.value=='')this.value='search...';" onfocus="if(this.value=='search...')this.value='';" value="search..." >
+				</div>
+			</form>
+            <script type="text/javascript">
+            function test(){
+                var keyword = $("#keyword").val();
+                if($("#keyword").val()=="search..." || $("#keyword").val()==""){
+                    //表示没有输入要搜索的值
+                    return ;
+                    }
+                document.getElementById("searchform").action=document.getElementById("searchform").action+"keyword="+keyword;
+
+                }
+            </script>
+                     </div>
+            </div>
+
+            <div id="logo">
+                <a href="/"><h1>Djangoblogdemo</h1></a>
+                <p>Djangoblogdemo</p>
+            </div>
+
+            <nav>
+                <div class="wrap-nav">
+                    <div class="menu">
+                        <ul>
+
+                            <li><a href="/index">Home</a></li>
+                            {% for category in categories %}
+                                <li><a href="/category/{{ category.id }}">{{ category }}</a></li>
+                            {% endfor %}
+                            <li><a href="/about">About</a></li>
+                            <li><a href="/about">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+        </div>
+    </header>
+    <div class="copyrights">Collect from <a href="http://www.fualan.com/"  title="傅sir">傅sir</a></div>
+    <!--------------Content--------------->
+    <section id="content">
+        <div class="wrap-content">
+            <div class="row block">
+                <div id="main-content" class="col-2-3">
+                    <div class="wrap-col">
+
+                        {% block content %}{% endblock %}
+
+                    </div>
+                </div>
+                <div id="sidebar" class="col-1-3">
+                    <div class="wrap-col">
+                        <div class="box">
+                            <div class="heading"><h2>About me</h2></div>
+                            <div class="content">
+                                <a href="/" target="_blank"><img src="/static/blog/images/fualan.jpg" style="border: 0px;"/></a>
+                                <p>Djangoblogdemo created by <a href="http://www.fualan.com" target="_blank">alan_fu</a>. You can use and modify the template for both personal and commercial use. You must keep all copyright information and credit links in the template and associated files.</p>
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="heading"><h2>Categories</h2></div>
+                            <div class="content">
+                                <ul>
+                                    {% for category in categories %}
+                                        <li><a href="/category/{{ category.id }}">{{ category.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="heading"><h2>New Post</h2></div>
+                            <div class="content">
+                                {% for recent_article in recent_articles %}
+                                    <div class="post">
+                                        <img src="/static/blog/images/img4.jpg" width="50px"/>
+                                        <h4><a href="/article/{{ recent_article.id }}">{{ recent_article.title }}</a></h4>
+                                        <p>{{ recent_article.created }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="heading"><h2>archives</h2></div>
+                            <div class="content">
+                                <ul>
+                                    {% for archive_date in archives_date %}
+                                        <li><a href="/archive/{{ archive_date.date.year }}/{{ archive_date.date.month }}">{{ archive_date.date.year  }}-{{ archive_date.date.month }}<span>---({{ archive_date.pk__count }})</span></a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--------------Footer--------------->
+    <footer>
+        <div class="copyright">
+            <p>Copyright © 2016 - Collect from <a href="http://www.fualan.com/" title="djangoblogdemo" target="_blank">djangoblogdemo</a></p>
+        </div>
+    </footer>
+
+</div>
+</body></html>

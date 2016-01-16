@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load blog_extras %}
+{% block title %}{% if title %}{{ title }}{% endif %}{% endblock %}
+{% block content %}
+
+    <article>
+        <div class="heading">
+            <h2><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
+        </div>
+        <div class="info">
+            <p><a href="/category/{{ article.category.id }}">{{ article.category.name  }}</a>,
+                点击数：{{ article.hits }} 发布时间： {{ article.created }}-
+                <a href="/article/{{ article.id }}#reply">{{ article.reply_count }} Commnets</a></p>
+            <p>{% for tag in article.tags.all %}<a href="/tag/{{ tag.id  }}"> {{ tag }}</a> {% endfor %}</p>
+        </div>
+        <div class="content">
+            {{ article.content | safe }}
+        </div>
+
+    </article>
+
+    <section>
+        <h3>Leave a Comment</h3>
+
+        <form id="contact-form" method="post">
+            {{ errors|dump_errors }}
+            <fieldset>
+
+                <label><input name="nickname" value="nickname" onBlur="if(this.value=='') this.value='nickname'" onFocus="if(this.value =='nickname' ) this.value=''" /></label>
+                <!-- 加载编辑器的容器 -->
+                <!-- 加载编辑器的容器 -->
+                <script id="container" name="content" type="text/plain"></script>
+                <input type="submit" id="checkall" class="btn-primary" value="立即回复"><br>
+            </fieldset>
+            <!-- 配置文件 -->
+            {% load staticfiles %}
+            <script type="text/javascript" src="{% static 'ueditor/ueditor.config.js' %}"></script>
+            <!-- 编辑器源码文件 -->
+            <script type="text/javascript" src="{% static 'ueditor/ueditor.all.js' %}"></script>
+            <!-- 实例化编辑器 -->
+            <script type="text/javascript">
+                var ue = UE.getEditor('container',{
+                    toolbars: [
+                        ['undo', 'redo', 'bold','italic','underline',
+                            'justifyleft', //居左对齐
+                            'justifyright', //居右对齐
+                            'justifycenter', //居中对齐
+                            'justifyjustify', //两端对齐
+                            'forecolor', //字体颜色
+                            'backcolor', //背景色
+                            'formatmatch', //格式刷
+                            'emotion', //表情
+                        ]
+                    ],
+                    {#             initialFrameHeight:400,#}
+                    initialFrameWidth:null,
+                    zIndex:50
+                });
+            </script>
+            {% csrf_token %}
+        </form>
+    </section>
+
+    <article id="reply" class="excerpt">
+        {% ifnotequal reply_page.total 0 %}
+            <header class="article-header">
+
+                <div class="ui-header">
+                    <h3>共有{{ reply_page.total }}条评论</h3>
+                </div>
+            </header>
+
+
+            {% for reply in replies %}
+                <article id="reply{{ floor|add:forloop.counter }}"  class="article-header article-content ">
+                    <div class="article-title">
+                        <img src="/static/blog/images/m_default.png" alt="" class="avatar" style="margin: 0px 0px 0px 0px"/>
+                        <h1> <span style="color: #0081c2; font-size: 20px;">{{ reply.nickname }}</span> <span class="time" style="float: right">{{ reply.created }}</span></h1>
+                    </div>
+                    <div class="meta">
+                        <span class="article-content " style="margin: 0px 0px 0px 50px">{{ reply.content|safe }}</span>
+                        <span class="J_replyTo" data-username="{{ reply.nickname }}"><i class="fa fa-reply"></i></span>
+
+                        <span class="floor fr" style="float: right"> #{{ floor|add:forloop.counter }}楼</span>
+
+                    </div>
+
+
+                </article>
+            {% endfor %}
+
+            <div class="ui-footer">
+                {% if reply_page.pages > 1 %}
+                    <div class="pagination pagination-mini">
+                        {% pagination reply_page request.get_full_path %}
+                    </div>
+                {% endif %}
+            </div>
+
+
+        {% else %}
+            <div class="alert mt20 no-replies">
+                暂无回复，说出你的观点吧
+            </div>
+        {% endifnotequal %}
+    </article>
+{% endblock %}

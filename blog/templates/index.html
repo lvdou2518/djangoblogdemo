@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load blog_extras %}
+{% block title %}{% if title %}{{ title }}{% endif %}{% endblock %}
+
+
+
+{% block content %}
+    {% for article in articles %}
+    <article>
+        <div class="heading">
+            <h2><a href="/article/{{ article.id }}">{{ article.title }}</a></h2>
+        </div>
+        <div class="info">
+            <p><a href="/category/{{ article.category.id }}">{{ article.category.name  }}</a>,
+                点击数：{{ article.hits }} 发布时间： {{ article.created }}-
+                <a href="/article/{{ article.id }}#reply">{{ article.reply_count }} Commnets</a></p>
+            <p>{% for tag in article.tags.all %}<a href="/tag/{{ tag.id  }}"> {{ tag }}</a> {% endfor %}</p>
+        </div>
+        <div class="content">
+            {{ article.content | safe }}
+        </div>
+
+    </article>
+{% endfor %}
+
+    {% if article_page.pages > 1 %}
+        <div class="pages">
+            {% pagination article_page request.get_full_path %}
+        </div>
+        {% endif %}
+
+
+{% endblock %}
